@@ -11,9 +11,10 @@
   },
   "files": [
     "lib",
-    "data",
+    "data/*.json",
+    "data/text",
     "preset",
-    "scripts",
+    "scripts/*.py",
     "cordis.patch.yml",
     "检索.ps1",
     "NOTICE",
@@ -45,6 +46,8 @@
   },
   "scripts": {
     "test": "node test/smoke.mjs",
+    "check:pack": "node scripts/check-pack.mjs",
+    "prepublishOnly": "node scripts/check-pack.mjs",
     "fetch:data": "python scripts/fetch_corpus.py",
     "build:data": "python scripts/build_corpus.py --kanripo-only"
   },
