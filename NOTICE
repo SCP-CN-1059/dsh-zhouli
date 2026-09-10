@@ -1,0 +1,68 @@
+dsh-zhouli — NOTICE
+===================
+
+Two different licenses cover two different parts of this repository. Read both.
+
+
+Code
+----
+
+Everything outside `data/` — the plugin, the agent preset, the scripts — is
+MIT licensed. See LICENSE.
+
+
+Corpus data (`data/`)
+---------------------
+
+Derived from the Kanseki Repository (漢籍リポジトリ / Kanripo),
+https://www.kanripo.org/ , maintained by the Institute for Research in
+Humanities, Kyoto University, and distributed via https://github.com/kanripo :
+
+    KR1d0001   《周禮》正文        (BASEEDITION tls)
+    KR1d0002   《周禮》鄭玄注       (BASEEDITION SBCK — 四部叢刊本)
+
+Kanripo states on its front page: "All content created by us is licensed under
+a CC BY SA license."
+
+Accordingly, the corpus files in `data/` — and any file produced from them by
+`scripts/build_corpus.py` — are distributed under the **Creative Commons
+Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)**,
+https://creativecommons.org/licenses/by-sa/4.0/ .
+
+If you redistribute this data, or a modified version of it, you must:
+
+  1. keep the attribution above, naming the Kanseki Repository and the two KR
+     identifiers; and
+  2. license your result under CC BY-SA 4.0 as well.
+
+The 《周礼》 text itself is an ancient work in the public domain. The license
+above covers the modern digitisation that this corpus is built from.
+
+
+Deliberately NOT distributed here
+---------------------------------
+
+The author's private working corpus uses two further witnesses:
+
+    殆知阁古代文献  儒藏/礼经/周礼.txt        (白文, simplified)
+    殆知阁古代文献  儒藏/礼经/周礼注疏.txt     (鄭玄注/賈公彥疏, simplified)
+
+Their upstream repository, https://github.com/garychowcmu/daizhigev20 ,
+declares **no license**. Nothing from those files — neither the text nor any
+collation derived from them — is redistributed in this repository.
+
+`scripts/fetch_corpus.py --with-daizhige` can retrieve them for local, private
+use if you want the fuller collation. Fetching them is your own decision and
+your own responsibility; if you publish results built on them, the licensing
+question is yours to resolve, not this project's.
+
+Note also that the 白文 witness carries a number of clear transcription errors
+(for example 建宫以捂 for 建國辨方, 疱人 for 庖人, 胥信人 for 胥十有二人).
+It is useful for collation precisely because it disagrees; it is not a text to
+cite on its own authority.
+
+
+Retrieval date
+--------------
+
+Kanripo sources retrieved 2026-09-10.

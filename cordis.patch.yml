@@ -1,0 +1,18 @@
+# The dsh-zhouli bundle patch: one model-facing row over the 《周礼》 corpus.
+#
+# This is applied as a profile layer after the profile template's own bundles,
+# so it is the whole of what installing this package changes. Nothing here
+# disables or restates an existing row.
+#
+# `tool-zhouli` provides no service — it only registers into the host `tools`
+# registry, so it needs no `isolate` realm; a realm around it would hide it
+# from every sibling row instead of protecting anything.
+#
+# Per-preset configuration: this row is the deployment-wide default. An agent
+# preset that wants a different corpus directory or result cap mounts its own
+# row of the same plugin with `config.dataDir` / `config.maxResults`; installing
+# this package is not required for that, only the packaged `data/` is.
+
+- insert:
+    - id: tool-zhouli
+      name: dsh-zhouli

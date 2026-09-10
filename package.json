@@ -1,0 +1,50 @@
+{
+  "name": "dsh-zhouli",
+  "version": "0.1.0",
+  "description": "《周礼》 lookup tool for the DeepSeek Harness — citable text with stable 篇序.职官序 coordinates, a per-office establishment/duty index, and collation between two independent witnesses.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "data",
+    "preset",
+    "scripts",
+    "cordis.patch.yml",
+    "NOTICE",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis-plugin",
+    "zhouli",
+    "周礼",
+    "rites-of-zhou",
+    "chinese-classics",
+    "agent-preset",
+    "corpus"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/smoke.mjs",
+    "fetch:data": "python scripts/fetch_corpus.py",
+    "build:data": "python scripts/build_corpus.py --kanripo-only"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.2"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-tools": "^0.1.2-rc.1"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

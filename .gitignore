@@ -1,0 +1,14 @@
+# Dependencies, if you install the peers locally to run the smoke test.
+node_modules/
+
+# Fetched sources. The BUILT corpus under data/*.json and data/text/ IS
+# committed — that is the artifact — but the raw downloads are re-fetchable and
+# are not. `python scripts/fetch_corpus.py` regenerates this tree; NOTICE
+# explains why the 殆知阁 files it can also fetch are not committed.
+data/raw/
+
+__pycache__/
+*.pyc
+*.part
+.DS_Store
+Thumbs.db
