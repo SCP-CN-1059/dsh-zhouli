@@ -140,6 +140,26 @@ npm test
 测试会取 `preset/skills/zhouli/SKILL.md` 之引文库与 `preset/agent.cordis.yml` 之 persona 引文，
 逐条回查语料 —— 故引文库与语料，不得各自漂移。
 
+### 打包与依赖上的两处讲究
+
+**一、`files` 不可写整目录。** `.gitignore` 只约束 git，**对 npm 毫无作用**；写 `"data"`
+会把 `data/raw/` 里未获授权的上游文本一并打进 tarball。故 `files` 收紧到
+`data/*.json` 与 `data/text`，并以 `scripts/check-pack.mjs` 逐条核对 dry-run 清单，
+挂在 `prepublishOnly` 上 —— 不通过则发不出去。
+
+**二、`@deepseek-ai/dsh-tools` 的 peer 范围须以 `||` 枚举各版本元组。**
+semver 只在范围中存在「`major.minor.patch` 元组相同、且自身带预发布标签」的比较符时
+才放行预发布版本。拿 20 个已发布版本实测：
+
+| 写法 | 未覆盖 |
+|---|---|
+| `^0.1.2-rc.1` | 19/20 |
+| `>=0.0.1-rc.1 <0.1.0 \|\| >=0.1.0-rc.1 <0.2.0-0`（某规范所举范例） | 11/20 |
+| `>=0.0.1-rc.1 <0.2.0` | 16/20 |
+| **本包采用：逐元组枚举** | **4/20**（仅四个远古 `0.0.1-rc.*`） |
+
+代价是未来新出现的预发布元组仍需追加分支 —— 这是 semver 规则的固有局限，无解。
+
 命令行检索（与插件共用同一份 `data/`）：
 
 ```powershell
