@@ -126,6 +126,10 @@ Copy-Item -Recurse .\preset "$env:USERPROFILE\.dsh\.agent-presets\zhouli"
 
 ## 开发
 
+以下命令都在**本仓库的检出目录**里运行，不在已安装的包里。
+（npm 的 `files` 字段决定了发布内容：`lib/ data/ preset/ scripts/ 检索.ps1` 会随包分发，
+`test/` 只在仓库里。）
+
 ```powershell
 # 取原始素材（约 21 个文件，来自 Kanripo 的 GitHub 仓库）
 python scripts\fetch_corpus.py
