@@ -1,59 +1,67 @@
 # dsh-zhouli · 周礼
 
-给 DeepSeek Harness 用的《周礼》插件：把《周礼》六篇全文做成一个模型可调用的 `zhouli` 工具，
-再配一个让整个会话都依六官法度行事的 agent 预设。
+《周礼》六篇，凡四万九千三百八十四字。此篇使之可为 agent 所检索、所引证。
 
-工具返回的每一条都带**稳定坐标** `篇序.职官序`（如 `1.1` 即〈大宰〉），
-所以 agent 引用的每一句都能回到原文核对。这不是修辞装饰——它要解决的是
-**agent 不再凭记忆背诵经文**。
+设官二，分职各有所掌：
 
-DeepSeek Harness / Cordis 的 `dsh-plugin`。
+一曰 **`zhouli`** —— 掌《周礼》全文之检索、职官之考据、两本之比勘；
+二曰 **「周礼模式」** —— 凡会话之始终，皆依六官法度而行。
+
+凡 `zhouli` 所出，条条系以坐标 `篇序.职官序`，如 `1.1` 即〈大宰〉，引证作《周礼·天官冢宰》1.1。
+所以然者：**所引须可覆按于原文，不得凭记忆而诵经。** 此非饰辞，是设此官之本意。
+
+DSH / Cordis 之 `dsh-plugin`。
 
 ---
 
-## 安装
+## 置官（安装）
 
 ```powershell
-# 从 GitHub 安装（尚未发布到 npm）
+# 自 npm 取之
+dsh plugin --profile web add dsh-zhouli
+```
+
+或径自 GitHub 取之：
+
+```powershell
 dsh plugin --profile web add github:SCP-CN-1059/dsh-zhouli
 ```
 
-装好后重启该 profile，`zhouli` 工具即出现在工具列表中。`dsh plugin` 转发给 **pnpm**，
-所以本机需要 pnpm 在 PATH 上。
+`dsh plugin` 转发于 **pnpm**，故本机须有 pnpm 在 PATH。装毕重启该 profile，`zhouli` 即入工具之列。
 
-> 本包在 `package.json` 中声明了 `dsh.bundle.patch`，因此 `dsh plugin add` 之后会被自动
-> 加入该 profile 的 layer stack —— 不需要手工改 composition 文件。
+本包于 `package.json` 中自陈 `dsh.bundle.patch`，故 `dsh plugin add` 之后自动入该 profile 之
+layer stack，**无须手改 composition**。
 
-不给整个 profile 装也可以：在自己的 agent preset 里挂一行同名的行即可，
+不愿为一 profile 置之，亦可于自设预设中自立一行：
 
 ```yaml
 - id: tool-zhouli
   name: dsh-zhouli
   config:
-    dataDir: ''     # 可选：默认用包内自带的 data/
-    maxResults: 20  # 可选：单次返回上限
+    dataDir: ''     # 可省，默认用包内自带 data/
+    maxResults: 20  # 可省，单次返回之上限
 ```
 
-## 用法
+## 职掌（用法）
 
-工具只有一个入口，靠 `action` 区分：
+工具一入口，以 `action` 辨事：
 
 ```
 zhouli(action, query?, coordinate?, chapter?, limit?)
 ```
 
-| action | 用途 | 参数 |
+| 事 | 所掌 | 所须 |
 |---|---|---|
-| `search` | 全文检索（繁体优先，简体兜底） | `query` 必填；`chapter`、`limit` 可选 |
-| `para` | 按坐标取一段原文（繁体＋简体对照） | `coordinate` 必填，形如 `1.1` |
-| `zhiguan` | 查某官职的员额编制与职掌 | `query` 为职官名；省略则列出全部 |
-| `list` | 列出某篇（或全部）的职官名 | `chapter`、`limit` 可选 |
-| `chapter` | 列出某篇的段落原文 | `chapter` 必填；`limit` 可选 |
-| `stats` | 语料库规模与底本来源 | — |
+| `search` | 掌全文检索，繁体优先，简体兜底 | `query` 必与；`chapter`、`limit` 可省 |
+| `para` | 掌按坐标取一段原文，繁体简体并列 | `coordinate` 必与，形如 `1.1` |
+| `zhiguan` | 掌考某官职之员额与职掌 | `query` 为职官名；省之则列其全 |
+| `list` | 掌列某篇（或全部）之职官名 | `chapter`、`limit` 可省 |
+| `chapter` | 掌列某篇之段落原文 | `chapter` 必与；`limit` 可省 |
+| `stats` | 掌报语料之数与底本所出 | 无 |
 
-`chapter` 接受繁体篇名、简体篇名或序号 1–6，三者等价。
+`chapter` 受繁体篇名、简体篇名、或序号 1–6，三者同功。
 
-典型往返：
+凡三事，可为常式：
 
 ```
 zhouli(action:"para", coordinate:"1.1")
@@ -71,82 +79,66 @@ zhouli(action:"search", query:"六計", chapter:"天官冢宰")
   → 命中 1 处（限 天官冢宰）……
 ```
 
-## Agent 预设：周礼模式
+## 坐标
 
-`preset/` 是一个完整的 agent preset（由 `standard` 复制而来），把这个包从"能查"变成"必须查"：
+凡段皆有坐标 `篇序.职官序`。
 
-- **常驻 persona**（order 0，遮蔽部署人设）规定三段法度：
-  - **开篇·设官分职** —— 接手任务先「辨方正位」（真正要做什么、边界、成功判据）与
-    「设官分职」（拆成工作单元，各明职掌与交付）；
-  - **事中·依典援据** —— 定六典归属，遇判断关口依「八法」自查（官屬·官職·官聯·官常·
-    官成·官法·官刑·官計），做工依《考工記》「審曲面埶，以飭五材，以辨民器」；
-  - **收尾·岁终之会** —— 每条会话以「会」收束：所职／所据／**六计自陈**（廉善·廉能·
-    廉敬·廉正·廉法·廉辨）／未竟／周礼背书（注明坐标）。
-  - 硬约束：**六计有做不到的照实写明，未验证的不得称为已验，引文必须真实存在。**
-- **自带 `zhouli` skill** —— 坐标系统、工具用法、引证格式，以及一份**已逐条核实**的引文库。
+篇序 1–6，依次为天官冢宰、地官司徒、春官宗伯、夏官司馬、秋官司寇、冬官考工記。
 
-安装（preset 与包分开）：
+职官序 `.0` 为该篇**叙官**，列全官之员额编制；`.1` 及以下，各官之职掌条文。
 
-```powershell
-Copy-Item -Recurse .\preset "$env:USERPROFILE\.dsh\.agent-presets\zhouli"
-```
+例：`1.0` 天官叙官，`1.1`〈大宰〉，`1.2`〈小宰〉，`3.21`〈大司樂〉，`6.1`〈輪人〉。
 
-然后在新建会话时选择「周礼模式」。
+引证之式：**《周礼·天官冢宰》1.1**。
 
-## 语料库
+## 六官（语料库）
 
 | | |
 |---|---|
-| 篇数 | 6（天官冢宰 / 地官司徒 / 春官宗伯 / 夏官司馬 / 秋官司寇 / 冬官考工記） |
-| 汉字 | 49,384（不含标点） |
-| 段落 | 383 |
+| 篇 | 6 |
+| 汉字 | 49,384（不计标点） |
+| 段 | 383 |
 | 职官 | 377（去重 374） |
-| 互校 | Kanripo 两本之间 567 条异文事件 |
+| 互校 | Kanripo 两本之间 567 条异文 |
 
-`data/` 下四个 JSON（`zhouli.json` 主数据、`zhiguan.json` 职官索引、`jiaokan.json`
-校勘记、`stats.json` 统计）供插件读取，`data/text/` 下是同一份语料的人可读纯文本。
+`data/` 下四篇 JSON —— `zhouli.json` 主数据、`zhiguan.json` 职官索引、`jiaokan.json` 校勘记、
+`stats.json` 统计 —— 为插件所读；`data/text/` 下为同一语料之人可读文本。
 
-### 坐标系统
+## 法度（授权）
 
-每段有稳定坐标 `篇序.职官序`：`.0` 是该篇「叙官」（全部官职的员额编制），`.1` 及以下
-是各官职的职掌条文。引证写作 **《周礼·天官冢宰》1.1**。
-
-## 授权
-
-**两部分，两种许可。**
+**二分，各有所属。**
 
 - **代码**（插件、预设、脚本）—— MIT，见 `LICENSE`。
-- **语料**（`data/`）—— 底本取自 [Kanripo 漢籍リポジトリ](https://www.kanripo.org/)
+- **语料**（`data/`）—— 底本出自 [Kanripo 漢籍リポジトリ](https://www.kanripo.org/)
   （京都大学人文科学研究所）`KR1d0001`《周禮》正文与 `KR1d0002`《周禮》鄭玄注，
-  采用 **CC BY-SA 4.0**。转发或改写这份数据时须保留署名，并以相同方式共享。
-  《周礼》原文本身属公有领域；上述许可覆盖的是它所依据的现代数字化成果。
+  为 **CC BY-SA 4.0**。转发或改写者，须存其署名，并以相同方式共享。
+  《周礼》本文属公有领域；此许可所覆者，是其现代数字化之成果。
 
-本仓库**不包含**殆知阁古代文献的两份校本（其上游仓库未声明任何许可证），也不包含
-由它们派生的校勘结果。`scripts/fetch_corpus.py --with-daizhige` 可为本地自用取回它们，
-是否这样做以及随之而来的授权问题由你自己判断。
+本仓库**不收**殆知阁古代文献之二本（其上游仓库未声明任何许可证），亦不收由其派生之校勘结果。
+`scripts/fetch_corpus.py --with-daizhige` 可为本地自用取之；取与不取、随之而来的授权问题，
+由取者自决。
 
-全部细节见 `NOTICE`。
+其详在 `NOTICE`。
 
-## 开发
+## 考工（开发）
 
-以下命令都在**本仓库的检出目录**里运行，不在已安装的包里。
-（npm 的 `files` 字段决定了发布内容：`lib/ data/ preset/ scripts/ 检索.ps1` 会随包分发，
-`test/` 只在仓库里。）
+以下诸事，皆于**本仓库检出目录**中行之，不在已装之包内。
+（npm 以 `files` 定发布之内容：`lib/ data/ preset/ scripts/ 检索.ps1` 随包而去，`test/` 唯在仓库。）
 
 ```powershell
-# 取原始素材（约 21 个文件，来自 Kanripo 的 GitHub 仓库）
+# 取原始素材（Kanripo，凡 21 件）
 python scripts\fetch_corpus.py
 
-# 构建 data/ 下的语料（--kanripo-only 只使用 CC BY-SA 的 Kanripo 两本）
+# 构建 data/ 之语料（--kanripo-only 只用 CC BY-SA 之 Kanripo 两本）
 python scripts\build_corpus.py --kanripo-only
 
-# 冒烟测试：35 项，含回查引文库与 persona 引文是否真的存在于语料中
+# 冒烟测试：三十五事，含回查引文库与 persona 所引是否真在语料之中
 npm test
 ```
 
-`npm test` 需要 `@deepseek-ai/{cordis,dsh-tools,schemastery}` 可解析（本地软链或
-`npm install` 皆可）。测试会解析 `preset/skills/zhouli/SKILL.md` 的引文库与
-`preset/agent.cordis.yml` 的 persona 引文，逐条回查语料 —— 引文库与语料因此不会各自漂移。
+`npm test` 须 `@deepseek-ai/{cordis,dsh-tools,schemastery}` 可解析（本地软链或 `npm install` 皆可）。
+测试会取 `preset/skills/zhouli/SKILL.md` 之引文库与 `preset/agent.cordis.yml` 之 persona 引文，
+逐条回查语料 —— 故引文库与语料，不得各自漂移。
 
 命令行检索（与插件共用同一份 `data/`）：
 
@@ -158,15 +150,39 @@ npm test
 .\检索.ps1 校勘 -篇 天官冢宰
 ```
 
-> **`检索.ps1` 必须以「带 BOM 的 UTF-8」保存。** Windows PowerShell 5.1 在没有 BOM 时
-> 按系统 ANSI 代码页解码 `.ps1`，脚本里的中文命令名会立刻变成乱码并导致解析失败。
-> 若改动后发现脚本报语法错，先检查 BOM：
+> **`检索.ps1` 须以「带 BOM 之 UTF-8」存之。** Windows PowerShell 5.1 于无 BOM 时，按系统
+> ANSI 代码页解 `.ps1`，其中文命令名立成乱码，脚本不可解析。若改毕而报语法错，先验其 BOM：
 > ```powershell
 > $p = '.\检索.ps1'
 > $t = Get-Content $p -Raw -Encoding UTF8
 > [IO.File]::WriteAllText($p, $t, (New-Object Text.UTF8Encoding($true)))
 > ```
 
-## 授权
+---
 
-代码 MIT，语料 CC BY-SA 4.0。详见 `LICENSE` 与 `NOTICE`。
+## 周礼模式（预设）
+
+`preset/` 为一完整 agent 预设（自 `standard` 复制而来），使此包自「能查」进于「必查」。
+
+**常驻 persona**（order 0，遮蔽部署人设）立三段之法：
+
+一曰 **开篇·设官分职** —— 《周礼·天官冢宰》云「惟王建國，辨方正位，體國經野，設官分職，以為民極」。
+接手任何任务，先以一两行辨方正位、设官分职，而后动手。
+
+二曰 **事中·依典援据** —— 先定六典之属；凡遇判断关口，依八法自查
+（官屬·官職·官聯·官常·官成·官法·官刑·官計）；做工依《考工記》「審曲面埶，以飭五材，以辨民器」。
+
+三曰 **收尾·岁终之会** —— 每条会话以「会」收束：所职、所据、**六计自陈**
+（廉善·廉能·廉敬·廉正·廉法·廉辨）、未竟、周礼背书（注明坐标）。
+
+其硬约束：**六计有做不到者照实写明；未验证者不得称为已验；引文必须真实存在。**
+
+**自带 `zhouli` 技能** —— 载坐标系统、工具用法、引证格式，及一份已逐条核实之引文库。
+
+置之（预设与包分置）：
+
+```powershell
+Copy-Item -Recurse .\preset "$env:USERPROFILE\.dsh\.agent-presets\zhouli"
+```
+
+而后新建会话时择「周礼模式」。
