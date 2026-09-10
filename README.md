@@ -1,10 +1,13 @@
-# dsh-zhouli
+# dsh-zhouli · 周礼
 
-**《周礼》 for the DeepSeek Harness** — one model-facing `zhouli` tool over a structured corpus of the *Rites of Zhou* (《周礼》, the *Zhou Guan*), plus an agent preset whose persona runs every session under the classic's 六官法度.
+给 DeepSeek Harness 用的《周礼》插件：把《周礼》六篇全文做成一个模型可调用的 `zhouli` 工具，
+再配一个让整个会话都依六官法度行事的 agent 预设。
 
-Every row the tool returns carries a stable coordinate — `篇序.职官序`, e.g. `1.1` for 〈大宰〉 — so a citation an agent emits can be traced back to the text and checked. The point is not decoration: it is that an agent stops reciting a classic from memory when it can look it up.
+工具返回的每一条都带**稳定坐标** `篇序.职官序`（如 `1.1` 即〈大宰〉），
+所以 agent 引用的每一句都能回到原文核对。这不是修辞装饰——它要解决的是
+**agent 不再凭记忆背诵经文**。
 
-A `dsh-plugin` for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) / Cordis.
+DeepSeek Harness / Cordis 的 `dsh-plugin`。
 
 ---
 
@@ -164,6 +167,6 @@ npm test
 > [IO.File]::WriteAllText($p, $t, (New-Object Text.UTF8Encoding($true)))
 > ```
 
-## License
+## 授权
 
-Code MIT; corpus data CC BY-SA 4.0. See `LICENSE` and `NOTICE`.
+代码 MIT，语料 CC BY-SA 4.0。详见 `LICENSE` 与 `NOTICE`。

@@ -1,7 +1,7 @@
 {
   "name": "dsh-zhouli",
   "version": "0.1.0",
-  "description": "《周礼》 lookup tool for the DeepSeek Harness — citable text with stable 篇序.职官序 coordinates, a per-office establishment/duty index, and collation between two independent witnesses.",
+  "description": "《周礼》插件：给 DeepSeek Harness 提供一个带稳定坐标（篇序.职官序）的全文检索工具，含职官员额/职掌索引与 Kanripo 两本互校勘记，并附一套依六官法度行事的 agent 预设。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
