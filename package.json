@@ -31,6 +31,18 @@
     "corpus"
   ],
   "license": "MIT",
+  "author": "SCP-CN-1059",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SCP-CN-1059/dsh-zhouli.git"
+  },
+  "homepage": "https://github.com/SCP-CN-1059/dsh-zhouli#readme",
+  "bugs": {
+    "url": "https://github.com/SCP-CN-1059/dsh-zhouli/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "node test/smoke.mjs",
     "fetch:data": "python scripts/fetch_corpus.py",
