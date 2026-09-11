@@ -71,6 +71,12 @@ const office = await run({ action: 'zhiguan', query: '大宰', limit: 1 })
 check('zhiguan returns 员额', office.includes('卿一人'), office.slice(0, 120))
 check('zhiguan returns 职掌', office.includes('掌建邦之六典'))
 
+// The index shipped a 160-character 职掌 once, with no marker, and the model
+// cites what it is handed — so pin the end of the longest duty in the corpus.
+const duty = await run({ action: 'zhiguan', query: '大宰', limit: 1 })
+check('zhiguan hands back the whole 职掌, not a truncated index copy',
+  duty.includes('而誅賞之。'), `output ${duty.length} chars`)
+
 // ── list / chapter ──────────────────────────────────────────────────────────
 const list = await run({ action: 'list', chapter: '冬官考工记', limit: 5 })
 check('list accepts a simplified chapter name', list.includes('輪人'), list.slice(0, 80))
@@ -100,6 +106,35 @@ for (const row of rows) {
   check(`quote ${row.coordinate} exists`, found.includes(row.quote), row.quote.slice(0, 24))
   check(`quote ${row.coordinate} is in 《${row.chapter}》`, found.includes(`《周礼·${row.chapter}》`))
 }
+
+// ── jiaokan: the collation the skill promises to disclose ───────────────────
+// The skill requires a variant reading to be stated when one exists, so the
+// collation must be reachable through the tool and not only through files.
+const summary = await run({ action: 'jiaokan' })
+check('jiaokan totals the collation', summary.includes('合计 567 条'), summary.split('\n')[0])
+
+const chapterNotes = await run({ action: 'jiaokan', chapter: '冬官考工记', limit: 2 })
+check('jiaokan takes a simplified chapter name',
+  chapterNotes.includes('冬官考工記') && chapterNotes.includes('异文 128 条'), chapterNotes.split('\n')[0])
+
+const variant = await run({ action: 'jiaokan', coordinate: '6.0' })
+check('jiaokan reports the known variant at 6.0',
+  variant.includes('此段有异文') && variant.includes('埶以') && variant.includes('执以'),
+  variant.split('\n').slice(-3).join(' ').slice(0, 80))
+
+const clean = await run({ action: 'jiaokan', query: '惟王建國，辨方正位，體國經野，設官分職，以為民極' })
+check('jiaokan clears a quoted line that has no variant', clean.includes('此句无异文'), clean.slice(0, 60))
+
+let quotedWithVariant = 0
+for (const row of rows) {
+  const notes = await run({ action: 'jiaokan', query: row.quote })
+  check(`jiaokan resolves the quoted line at ${row.coordinate}`, notes.includes('引句'))
+  if (notes.includes('此句有异文')) quotedWithVariant++
+}
+// Exactly one row of the table sits on a recorded variant. If the collation is
+// rebuilt and this count moves, the skill's own footnote has to move with it.
+check('the quotation table carries exactly one variant row',
+  quotedWithVariant === 1, `got ${quotedWithVariant}`)
 
 // ── the persona's citations must match the corpus too ───────────────────────
 // Extract them from the persona rather than restating them here: a hand-kept

@@ -344,7 +344,6 @@ def main():
                 "目次名": toc_name,
                 "取名方式": how,
                 "员额": staff.get(name, staff.get(toc_name, "")),
-                "职掌": body[:120],
                 "_全段": body,
             })
 
@@ -554,7 +553,7 @@ def main():
                 rec["篇"].append(c["篇名"])
             rec["条目"].append({
                 "篇": c["篇名"], "篇序": c["序号"], "职官序": o["序号"],
-                "员额": o["员额"], "职掌": o["_全段"][:160],
+                "员额": o["员额"], "职掌": o["_全段"],
                 "取名方式": o["取名方式"]})
     with open(os.path.join(STRUCT, "zhiguan.json"), "w", encoding="utf-8") as w:
         json.dump({"职官数": len(zhiguan), "职官": list(zhiguan.values())},
