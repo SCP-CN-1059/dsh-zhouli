@@ -1,6 +1,6 @@
 {
   "name": "dsh-zhouli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "DeepSeek Harness 的《周礼》插件。主打「周礼模式」agent 预设：会话全程依六官法度——开工「设官分职」，事中「依典援据」，收尾「岁终之会」依六计考成。另附 zhouli 工具，检索带稳定坐标（篇序.职官序）的《周礼》全文，含职官员额／职掌索引与 Kanripo 两本互校。",
   "type": "module",
   "main": "lib/index.js",
@@ -14,7 +14,9 @@
     "data/*.json",
     "data/text",
     "preset",
-    "scripts/*.py",
+    "scripts/build_corpus.py",
+    "scripts/fetch_corpus.py",
+    "scripts/zhouli.py",
     "cordis.patch.yml",
     "检索.ps1",
     "NOTICE",
@@ -47,13 +49,14 @@
   "scripts": {
     "test": "node test/smoke.mjs",
     "check:pack": "node scripts/check-pack.mjs",
+    "check:peers": "node scripts/check-peers.js",
     "prepublishOnly": "node scripts/check-pack.mjs",
     "fetch:data": "python scripts/fetch_corpus.py",
     "build:data": "python scripts/build_corpus.py --kanripo-only"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.2",
-    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.2 <0.2.0 || >=0.1.1-rc.1 <0.2.0 || >=0.1.2-alpha.2 <0.2.0 || >=0.1.3-alpha.2 <0.2.0 || >=0.1.5-alpha.1 <0.2.0",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.2 <0.2.0 || >=0.1.1-rc.1 <0.2.0 || >=0.1.2-alpha.2 <0.2.0 || >=0.1.3-alpha.2 <0.2.0 || >=0.1.5-alpha.1 <0.2.0 || >=0.1.6-alpha.1 <0.2.0 || >=0.1.7-alpha.1 <0.2.0 || >=0.2.0-rc.1 <0.3.0",
     "@deepseek-ai/schemastery": "^3.18.2"
   },
   "dsh": {
