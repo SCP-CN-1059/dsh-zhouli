@@ -73,13 +73,26 @@ function publishedVersions(name) {
   return JSON.parse(runNpm(['view', name, 'versions', '--json']))
 }
 
+/**
+ * 预发布版本本身不算缺口，只要同一元组的正式版已发布且被覆盖。
+ *
+ * 依据：4.0.5-alpha.1 并不比 4.0.5 新，收下 4.0.5 就已经表达了「至此为止」，
+ * 再用 `>=4.0.5-alpha.1` 去声明只是把没测过的快照也算作承诺。
+ * 反之 0.2.1-rc.2 背后没有已发布的 0.2.1 可依托，它确实比 0.2.0 新，是缺口。
+ */
+function coveredByItsRelease(version, range, published) {
+  if (!semver.prerelease(version)) return false
+  const release = `${semver.major(version)}.${semver.minor(version)}.${semver.patch(version)}`
+  return published.includes(release) && semver.satisfies(release, range)
+}
+
 let allOk = true
 console.log('=== peer 范围覆盖核查 ===')
 for (const [name, range] of Object.entries(pkg.peerDependencies)) {
   const versions = publishedVersions(name)
   const floor = floorOf(range)
   const inScope = versions.filter((v) => atOrAbove(v, floor))
-  const missed = inScope.filter((v) => !semver.satisfies(v, range))
+  const missed = inScope.filter((v) => !semver.satisfies(v, range) && !coveredByItsRelease(v, range, versions))
   const latest = versions[versions.length - 1]
   const latestOk = semver.satisfies(latest, range)
 
@@ -87,6 +100,8 @@ for (const [name, range] of Object.entries(pkg.peerDependencies)) {
   console.log(`    下限 ${floor}  已发布 ${versions.length} 个，其中不低于下限的 ${inScope.length} 个`)
   console.log(`    未覆盖（不低于下限者）: ${missed.length ? missed.join(', ') : '无'}`)
   console.log(`    最新版 ${latest} 被覆盖: ${latestOk}`)
+  const exempt = inScope.filter((v) => !semver.satisfies(v, range) && coveredByItsRelease(v, range, versions))
+  if (exempt.length) console.log(`    正式版已覆盖故免计: ${exempt.join(', ')}`)
   const below = versions.filter((v) => !atOrAbove(v, floor))
   if (below.length) console.log(`    低于下限故有意排除: ${below.join(', ')}`)
 
