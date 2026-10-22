@@ -10,5 +10,6 @@ data/raw/
 __pycache__/
 *.pyc
 *.part
+*.tgz
 .DS_Store
 Thumbs.db

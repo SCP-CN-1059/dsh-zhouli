@@ -94,7 +94,7 @@ for (const key of ['天官冢宰', '地官司徒', '春官宗伯', '夏官司馬
 // The preset tells the model to trust this table without re-checking, so the
 // table is exactly the thing that must not drift. Parse it and look every row
 // up through the same tool the model would use.
-const skillPath = new URL('../preset/skills/zhouli/SKILL.md', import.meta.url)
+const skillPath = new URL('../skills/zhouli/SKILL.md', import.meta.url)
 const skillText = readFileSync(skillPath, 'utf8')
 const rows = [...skillText.matchAll(
   /^\|\s*《周礼·([^》]+)》\s*(\d+\.\d+)\s*\|\s*([^|]+?)\s*\|/gm,
@@ -141,7 +141,8 @@ check('the quotation table carries exactly one variant row',
 // list drifts from the file it is supposed to guard, which is the failure this
 // whole preset is about. Only 「…」 spans of eight or more characters are
 // quotations — shorter ones are the term glosses like 「八法」.
-const presetText = readFileSync(new URL('../preset/agent.cordis.yml', import.meta.url), 'utf8')
+// the preset declaration itself, which is where the persona now lives.
+const presetText = readFileSync(new URL('../cordis.patch.yml', import.meta.url), 'utf8')
 const personaQuotes = [...presetText.matchAll(/「([^」]{8,})」/g)].map((m) => m[1])
 check('persona carries quotations', personaQuotes.length >= 4, `got ${personaQuotes.length}`)
 for (const quote of personaQuotes) {

@@ -20,7 +20,8 @@ DSH / Cordis 之 `dsh-plugin`。
 
 ## 周礼模式（预设）
 
-`preset/` 为一完整 agent 预设（自 `standard` 复制而来），使此包自「能查」进于「必查」。
+`preset-zhouli` 为一行声明，书于本包 `cordis.patch.yml`，随包入 profile 之 layer stack。
+**无须拷贝目录——自 0.2 起，亦无目录可拷。**
 
 **常驻 persona**（order 0，遮蔽部署人设）立三段之法：
 
@@ -35,19 +36,13 @@ DSH / Cordis 之 `dsh-plugin`。
 
 其硬约束：**六计有做不到者照实写明；未验证者不得称为已验；引文必须真实存在。**
 
-**自带 `zhouli` 技能** —— 载坐标系统、工具用法、引证格式，及一份已逐条核实之引文库。
+**自带 `zhouli` 技能** —— 载坐标系统、工具用法、引证格式，及一份已逐条核实之引文库。此技能
+以 `customSkillDirs` 锚定于包内 `skills/`，与预设同行，装包即在。
 
-置之。预设与包分置：`zhouli` 工具由下节之包提供，预设则是这一目录的整体拷贝。
+置之。预设与工具同出一包：下节装毕、重启该 profile，新建会话时「周礼模式」自现于预设之列。
 
-```powershell
-# 自仓库检出
-Copy-Item -Recurse .\preset "$env:USERPROFILE\.dsh\.agent-presets\zhouli"
-
-# 或自已装好的包（下节安装之后，profile 名按实际替换）
-Copy-Item -Recurse "$env:USERPROFILE\.dsh\profiles\web\node_modules\dsh-zhouli\preset" "$env:USERPROFILE\.dsh\.agent-presets\zhouli"
-```
-
-而后新建会话时择「周礼模式」。
+> **旧版迁移**：0.2 以前之预设为目录式（`~\.dsh\.agent-presets\zhouli\`），今已无人读取。
+> 曾装旧版者，径删此目录即可；不删亦无害。
 
 ---
 
@@ -67,7 +62,12 @@ dsh plugin --profile web add github:SCP-CN-1059/dsh-zhouli
 `dsh plugin` 转发于 **pnpm**，故本机须有 pnpm 在 PATH。装毕重启该 profile，`zhouli` 即入工具之列。
 
 本包于 `package.json` 中自陈 `dsh.bundle.patch`，故 `dsh plugin add` 之后自动入该 profile 之
-layer stack，**无须手改 composition**。
+layer stack，**无须手改 composition**；`zhouli` 工具与「周礼模式」预设，皆由这一行声明带来。
+
+**若二者未现**：查该 profile 之 `dsh.profile.bundles` 是否已含 `dsh-zhouli`。harness 只在
+「本次新增之依赖」上做 reconcile，已装之包再 `add` 一次不会补录。此时于插件管理器中启用此项
+（`plugin_manager {action:"set_bundle", target:"dsh-zhouli", enabled:true}`）即可，其效同于手改
+composition。
 
 不愿为一 profile 置之，亦可于自设预设中自立一行：
 
@@ -161,7 +161,7 @@ zhouli(action:"search", query:"六計", chapter:"天官冢宰")
 ## 考工（开发）
 
 以下诸事，皆于**本仓库检出目录**中行之，不在已装之包内。
-（npm 以 `files` 定发布之内容：`lib/ data/ preset/ scripts/ 检索.ps1` 随包而去，`test/` 唯在仓库。）
+（npm 以 `files` 定发布之内容：`lib/ data/ skills/ scripts/ 检索.ps1` 随包而去，`test/` 唯在仓库。）
 
 ```powershell
 # 取原始素材（Kanripo，凡 21 件）
@@ -175,7 +175,7 @@ npm test
 ```
 
 `npm test` 须 `@deepseek-ai/{cordis,dsh-tools,schemastery}` 可解析（本地软链或 `npm install` 皆可）。
-测试会取 `preset/skills/zhouli/SKILL.md` 之引文库与 `preset/agent.cordis.yml` 之 persona 引文，
+测试会取 `skills/zhouli/SKILL.md` 之引文库与 `cordis.patch.yml` 之 persona 引文，
 逐条回查语料 —— 故引文库与语料，不得各自漂移。
 
 ### 打包与依赖上的两处讲究
